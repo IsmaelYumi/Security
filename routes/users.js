@@ -18,6 +18,7 @@ router.get("/", async function (req, res, next) {
   });
   let rolesColection= await models.roles.findAll({});
   res.render("crud", {
+    username: req.cookies['username'],
     title: "Crud whith users",
     usersArray: usersCollection,
     rolesArray: rolesColection,
@@ -28,7 +29,7 @@ router.post("/", async (req, res) => {
   /* 3. Desestructure los elementos en el cuerpo del requerimiento */
   let { name, password, idrole } = req.body;
   try {
-    /* 4. Utilice la variable SALT para encriptar la variable password. */
+    /* Encriptacion */
     let salt = process.env.SALT;
     let hash = crypto
       .createHmac("sha512", salt)
@@ -39,7 +40,7 @@ router.post("/", async (req, res) => {
     let user = await models.users.create({
       name: name,
       password: passwordHash,
-    }) ;
+    });
     let usr=await models.users_roles.create({ users_iduser: user.iduser, roles_idrole: idrole })
     /* 6. Redireccione a la ruta con la vista principal '/users' */
     res.redirect("/users");
